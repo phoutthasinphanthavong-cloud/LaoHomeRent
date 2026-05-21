@@ -284,7 +284,7 @@
     <section class="hero">
         <h1 class="lang-lo">...ຊອກຫາບ້ານເຊົ່າ ທີ່ຖືກໃຈທ່ານ...</h1>
         <h1 class="lang-en">Find Your Dream House for Rent</h1>
-        <p class="lang-lo">ລວມບ້ານເຊົ່າ, ເຮືອນວິນລາ, ແລະ ຫ້ອງແຖວລາຄາສຸດພિເສດ ໃນນະຄອນຫຼວງວຽງຈັນ</p>
+        <p class="lang-lo">ລວມບ້ານເຊົ່າ, ເຮືອນວິນລາ, ແລະ ຫ້ອງແຖວລາຄາສຸດພިເສດ ໃນນະຄອນຫຼວງວຽງຈັນ</p>
         <p class="lang-en">Best houses, villas, and apartments for rent in Vientiane Capital</p>
     </section>
 
@@ -294,15 +294,15 @@
             <h2><i class="fa-solid fa-sliders"></i> <span class="lang-lo">ລະບົບຈັດການຫຼັງບ້ານ</span><span class="lang-en">Admin Dashboard</span></h2>
             <form id="house-form" class="admin-form">
                 <div class="form-group">
-                    <label># <span class="lang-lo">ຊື່ຫົວຂໍ້/ເຮືອນເຊົ່າ</span><span class="lang-en">Property Title</span></label>
+                    <label># <span class="lang-lo">ชື່ຫົວຂໍ້/ເຮືອນເຊົ່າ</span><span class="lang-en">Property Title</span></label>
                     <input type="text" id="add-title" class="form-input" placeholder="Example: Beautiful Villa" required>
                 </div>
                 <div class="form-group">
                     <label># <span class="lang-lo">ເລືອກເຂດ/ເມືອງ</span><span class="lang-en">Select District</span></label>
                     <select id="add-location" class="form-input" required>
-                        <option value="ເມືອງ ໄຊເສດຖາ / Xaysettha">ເມືອງ ໄຊເສດຖາ / Xaysettha</option>
-                        <option value="ເມືອງ ສີສັດຕະນາກ / Sisattanak">ເມືອງ ສີສັດຕະນາກ / Sisattanak</option>
-                        <option value="ເມືອງ ຈັນທະບູລີ / Chanthabouly">ເມືອງ ຈັນທະບູລີ / Chanthabouly</option>
+                        <option value="ເມືອງ ໄຊເສດຖາ">ເມືອງ ໄຊເສດຖາ / Xaysettha</option>
+                        <option value="ເມືອງ ສີສັດຕະນາກ">ເມືອງ ສີສັດຕະນາກ / Sisattanak</option>
+                        <option value="ເມືອງ ຈັນທະບູລີ">ເມືອງ ຈັນທະບູລີ / Chanthabouly</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -379,9 +379,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // ຄ່າ Firebase Config ຂອງທ່ານ
         const firebaseConfig = {
             apiKey: "AIzaSyB_wQSSrU2wd0roLgtQ4rM0U9uoxcojaxg",
             authDomain: "laohomerent.firebaseapp.com",
@@ -394,11 +393,11 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getDatabase(app); // 🔄 ເປີດໃຊ້ Realtime Database
+        const housesRef = ref(db, 'houses'); // ຊີ້ໄປຫາ Child node ທີ່ຊື່ 'houses'
 
         let houses = [];
         let isAdminActive = false;
-
         const ADMIN_PASSWORD = "123456"; 
 
         function toggleAdminPanel() {
@@ -446,22 +445,27 @@
             } else {
                 document.body.setAttribute('data-lang', 'lo');
             }
+            window.filterHouses();
         });
 
-        // 🔄 Real-time Database Listener
-        onSnapshot(collection(db, "houses"), (snapshot) => {
+        // 🔄 Real-time Database Listener ດຶງຂໍ້ມູນແບບອັດຕະໂນມັດ
+        onValue(housesRef, (snapshot) => {
             houses = [];
-            snapshot.forEach((doc) => {
-                let data = doc.data();
-                data.id = doc.id;
-                houses.push(data);
-            });
-            filterHouses();
+            const data = snapshot.val();
+            if (data) {
+                Object.keys(data).forEach((key) => {
+                    houses.push({
+                        id: key,
+                        ...data[key]
+                    });
+                });
+            }
+            window.filterHouses();
         }, (error) => {
-            console.error("Error reading data from Firebase: ", error);
+            console.error("Error reading data from Realtime Database: ", error);
         });
 
-        // 📥 ຟັງກ໌ຊັ່ນເພີ່ມຂໍ້ມູນບ້ານເຊົ່າ
+        // 📥 ຟັງກ໌ຊັ່ນເພີ່ມຂໍ້ມູນບ້ານເຊົ່າລົງ Firebase Realtime Database
         async function addHouseToFirebase(e) {
             e.preventDefault();
             const price = parseInt(document.getElementById('add-price').value);
@@ -482,32 +486,32 @@
             };
 
             try {
-                await addDoc(collection(db, "houses"), newHouse);
+                await push(housesRef, newHouse); // 🔄 ບັນທຶກລົງ Realtime Database
                 alert("🎉 ເພີ່ມຂໍ້ມູນບ້ານເຊົ່າຫຼັງບ້ານສຳເລັດແລ້ວ!");
                 document.getElementById('house-form').reset();
             } catch (error) {
-                alert("❌ ບໍ່ສາມາດບັນທຶກໄດ້ເນື່ອງຈາກ: " + error.message + "\n\nແນະນຳໃຫ້ກວດເບິ່ງ Firestore Rules ໃນ Firebase Console ຂອງທ່ານວ່າໄດ້ເປີດໃຫ້ Read/Write ແລ້ວຫຼືບໍ່.");
+                alert("❌ ບໍ່ສາມາດບັນທຶກໄດ້ເນື່ອງຈາກ: " + error.message);
                 console.error("Error writing data: ", error);
             }
         }
         document.getElementById('house-form').addEventListener('submit', addHouseToFirebase);
 
-        // 🗑️ ຟັງກ໌ຊັ່ນລຶບຂໍ້ມູນບ້ານເຊົ່າ
-        async function deleteHouse(id, e) {
+        // 🗑️ ລະບົບລຶບຂໍ້ມູນອອກຈາກ Firebase Realtime Database
+        window.deleteHouse = async function(id, e) {
             e.stopPropagation();
             if(confirm("ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບບ້ານເຊົ່າຫຼັງນີ້?")) {
                 try {
-                    await deleteDoc(doc(db, "houses", id));
+                    const houseDocRef = ref(db, `houses/${id}`);
+                    await remove(houseDocRef); // 🔄 ລຶບອອກຈາກ Realtime Database
                     alert("ລຶບຂໍ້ມູນສຳເລັດ!");
                 } catch (error) {
                     alert("ບໍ່ສາມາດລຶບໄດ້: " + error.message);
                 }
             }
         }
-        window.deleteHouse = deleteHouse;
 
         // 🔍 Filter System
-        function filterHouses() {
+        window.filterHouses = function() {
             const grid = document.getElementById('house-grid');
             const selectedLocation = document.getElementById('location-select').value;
             const selectedPrice = document.getElementById('price-select').value;
@@ -527,12 +531,13 @@
             filtered.forEach(h => {
                 const card = document.createElement('div');
                 card.className = 'house-card';
-                card.onclick = () => openModal(h);
+                card.addEventListener('click', () => openModal(h));
+                
                 const displayAdminBtn = isAdminActive ? 'flex' : 'none';
 
                 card.innerHTML = `
                     <div class="admin-actions" style="display: ${displayAdminBtn};">
-                        <button class="btn-delete-house" onclick="deleteHouse('${h.id}', event)"><i class="fa-solid fa-trash"></i> ລຶບ</button>
+                        <button class="btn-delete-house" onclick="window.deleteHouse('${h.id}', event)"><i class="fa-solid fa-trash"></i> ລຶບ</button>
                     </div>
                     <div class="house-img-box">
                         <img src="${h.image}" class="house-img" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=500'">
@@ -552,8 +557,8 @@
                 grid.appendChild(card);
             });
         }
-        document.getElementById('location-select').addEventListener('change', filterHouses);
-        document.getElementById('price-select').addEventListener('change', filterHouses);
+        document.getElementById('location-select').addEventListener('change', window.filterHouses);
+        document.getElementById('price-select').addEventListener('change', window.filterHouses);
 
         // Pop-up Detail Modal
         function openModal(house) {
