@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     <style>
         :root {
             --primary: #1e3c72;      
@@ -18,6 +18,18 @@
             --gray: #718096;
             --card-bg: #ffffff;
             --border: #e2e8f0;
+            --danger: #e63946;
+            --text-main: #2d3748;
+        }
+
+        /* 🌓 Dark Mode Variables */
+        [data-theme="dark"] {
+            --bg-light: #0f172a;
+            --card-bg: #1e293b;
+            --dark: #f8fafc;
+            --border: #334155;
+            --text-main: #f8fafc;
+            --gray: #94a3b8;
         }
 
         * {
@@ -25,11 +37,18 @@
             margin: 0;
             padding: 0;
             font-family: 'Noto Sans Lao', 'Poppins', sans-serif;
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         body {
             background-color: var(--bg-light);
-            color: var(--dark);
+            color: var(--text-main);
+        }
+
+        /* 🌐 ລະບົບສະຫຼັບພາສາ (Multi-language Display) */
+        [data-lang="en"] .lang-lo,
+        [data-lang="lo"] .lang-en {
+            display: none !important;
         }
 
         /* NAVBAR */
@@ -56,10 +75,42 @@
         }
         .logo span { color: var(--accent); }
 
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-control {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-control:hover { opacity: 0.9; }
+
+        .btn-admin-gate {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
         /* HERO BANNER */
         .hero {
             background: linear-gradient(rgba(30, 60, 114, 0.75), rgba(42, 157, 143, 0.6)), url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1200') no-repeat center center/cover;
-            height: 350px;
+            height: 300px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -93,8 +144,8 @@
             border: 1px solid var(--border);
         }
         .filter-group { display: flex; flex-direction: column; gap: 8px; }
-        .filter-group label { font-size: 14px; font-weight: 600; color: var(--primary); }
-        .filter-select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; background-color: #fafafa; font-size: 15px; }
+        .filter-group label { font-size: 14px; font-weight: 600; color: var(--accent); }
+        .filter-select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; background-color: var(--bg-light); color: var(--text-main); font-size: 15px; }
 
         /* HOUSE GRID */
         .house-grid {
@@ -111,7 +162,7 @@
             display: flex;
             flex-direction: column;
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
         }
         .house-card:hover {
             transform: translateY(-5px);
@@ -121,43 +172,42 @@
         .house-img { width: 100%; height: 100%; object-fit: cover; }
         .status-tag { position: absolute; top: 15px; left: 15px; background-color: var(--accent); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         
+        /* ປຸ່ມລຶບສຳລັບ Admin */
+        .admin-actions { position: absolute; top: 15px; right: 15px; display: none; gap: 5px; z-index: 15; }
+        .btn-delete-house { background-color: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; }
+
         .house-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
-        .house-price { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
+        .house-price { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 5px; }
         .house-price span { font-size: 14px; color: var(--gray); font-weight: 400; }
-        .house-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--dark); }
+        .house-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
         .house-location { font-size: 14px; color: var(--gray); margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
         
         .house-details { display: flex; gap: 15px; padding-top: 15px; border-top: 1px solid var(--border); margin-top: auto; color: var(--gray); font-size: 14px; }
         .house-details span { display: flex; align-items: center; gap: 5px; }
 
-        .btn-view-detail { background-color: #f0f4f8; color: var(--primary); border: none; padding: 10px; border-radius: 8px; font-weight: 600; text-align: center; margin-top: 15px; width: 100%; }
+        .btn-view-detail { background-color: var(--bg-light); color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: 8px; font-weight: 600; text-align: center; margin-top: 15px; width: 100%; }
 
-        /* 🚪 STYLE ຂອງ POP-UP (MODAL) */
+        /* STYLE ຂອງ POP-UP */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
-            display: none; /* ປິດໄວ້ກ່ອນ */
+            display: none; 
             justify-content: center;
             align-items: center;
             z-index: 2000;
             padding: 20px;
         }
         .modal-box {
-            background-color: white;
+            background-color: var(--card-bg);
             width: 100%;
             max-width: 650px;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 15px 50px rgba(0,0,0,0.2);
             position: relative;
-            animation: fadeIn 0.3s ease-out;
             max-height: 90vh;
-            overflow-y: auto; /* ເລື່ອນລົງໄດ້ຖ້າຂໍ້ມູນຍາວ */
-        }
-        @keyframes fadeIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            overflow-y: auto; 
         }
         .close-modal {
             position: absolute;
@@ -172,13 +222,12 @@
             z-index: 10;
             display: flex; align-items: center; justify-content: center;
         }
-        .close-modal:hover { background-color: rgba(0,0,0,0.8); }
         .modal-img { width: 100%; height: 280px; object-fit: cover; }
         .modal-content { padding: 25px; }
-        .modal-price { font-size: 26px; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
-        .modal-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-        .modal-desc-title { font-weight: 600; margin-top: 20px; margin-bottom: 8px; color: var(--primary); }
-        .modal-desc { color: var(--text-gray); font-size: 15px; margin-bottom: 20px; line-height: 1.6; }
+        .modal-price { font-size: 26px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+        .modal-title { font-size: 22px; font-weight: 700; }
+        .modal-desc-title { font-weight: 600; margin-top: 20px; margin-bottom: 8px; color: var(--accent); }
+        .modal-desc { color: var(--text-main); font-size: 15px; margin-bottom: 20px; line-height: 1.6; }
         
         .btn-whatsapp {
             background-color: #25D366; color: white; border: none;
@@ -187,38 +236,116 @@
             text-decoration: none; width: 100%; font-size: 16px; margin-top: 15px;
         }
 
-        footer { background-color: var(--primary); color: white; text-align: center; padding: 25px; font-size: 14px; margin-top: 60px; }
+        /* 🛠️ STYLE ຂອງລະບົບຫຼັງບ້ານ */
+        .admin-panel {
+            display: none;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+            border: 2px dashed var(--primary);
+        }
+        .admin-panel h2 { color: var(--accent); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .admin-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 14px; font-weight: 600; }
+        .form-input { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background-color: var(--bg-light); color: var(--text-main); }
+        .btn-submit-house { grid-column: 1 / -1; background-color: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; margin-top: 10px; }
+
+        footer { background-color: #1e3c72; color: white; text-align: center; padding: 25px; font-size: 14px; margin-top: 60px; }
     </style>
 </head>
-<body>
+<body data-theme="light" data-lang="lo">
 
     <header>
         <div class="navbar">
             <a href="#" class="logo">LaoHome<span>Rent</span></a>
-            <div style="font-weight: 600; color: var(--gray);"><i class="fa-solid fa-envelope"></i> info@laohomerent.com</div>
+            <div class="nav-controls">
+                <button class="btn-control" id="theme-toggle">
+                    <i class="fa-solid fa-moon"></i>
+                    <span class="lang-lo">ໂໝດກາງຄືນ</span>
+                    <span class="lang-en">Dark Mode</span>
+                </button>
+                <button class="btn-control" id="lang-toggle">
+                    <i class="fa-solid fa-globe"></i>
+                    <span class="lang-lo">English</span>
+                    <span class="lang-en">ພາສາລາວ</span>
+                </button>
+                <button class="btn-admin-gate" id="admin-gate-btn">
+                    <i class="fa-solid fa-lock"></i> 
+                    <span class="lang-lo">ຫຼັງບ້ານ Admin</span>
+                    <span class="lang-en">Admin Panel</span>
+                </button>
+            </div>
         </div>
     </header>
 
     <section class="hero">
-        <h1>ຊອກຫາບ້ានເຊົ່າ ທີ່ຖືກໃຈທ່ານ</h1>
-        <p>ລວມບ້ານເຊົ່າ, ເຮືອນວິນລາ, ແລະ ຫ້ອງແຖວລາຄາສຸດພິເສດ ໃນນະຄອນຫຼວງວຽງຈັນ</p>
+        <h1 class="lang-lo">...ຊອກຫາບ້ານເຊົ່າ ທີ່ຖືກໃຈທ່ານ...</h1>
+        <h1 class="lang-en">Find Your Dream House for Rent</h1>
+        <p class="lang-lo">ລວມບ້ານເຊົ່າ, ເຮືອນວິນລາ, ແລະ ຫ້ອງແຖວລາຄາສຸດພિເສດ ໃນນະຄອນຫຼວງວຽງຈັນ</p>
+        <p class="lang-en">Best houses, villas, and apartments for rent in Vientiane Capital</p>
     </section>
 
     <main class="container">
+
+        <div class="admin-panel" id="admin-panel">
+            <h2><i class="fa-solid fa-sliders"></i> <span class="lang-lo">ລະບົບຈັດການຫຼັງບ້ານ</span><span class="lang-en">Admin Dashboard</span></h2>
+            <form id="house-form" class="admin-form">
+                <div class="form-group">
+                    <label># <span class="lang-lo">ຊື່ຫົວຂໍ້/ເຮືອນເຊົ່າ</span><span class="lang-en">Property Title</span></label>
+                    <input type="text" id="add-title" class="form-input" placeholder="Example: Beautiful Villa" required>
+                </div>
+                <div class="form-group">
+                    <label># <span class="lang-lo">ເລືອກເຂດ/ເມືອງ</span><span class="lang-en">Select District</span></label>
+                    <select id="add-location" class="form-input" required>
+                        <option value="ເມືອງ ໄຊເສດຖາ / Xaysettha">ເມືອງ ໄຊເສດຖາ / Xaysettha</option>
+                        <option value="ເມືອງ ສີສັດຕະນາກ / Sisattanak">ເມືອງ ສີສັດຕະນາກ / Sisattanak</option>
+                        <option value="ເມືອງ ຈັນທະບູລີ / Chanthabouly">ເມືອງ ຈັນທະບູລີ / Chanthabouly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label># <span class="lang-lo">ລາຄາເຊົ່າ (ກີບ/ເດືອນ)</span><span class="lang-en">Price (LAK/Month)</span></label>
+                    <input type="number" id="add-price" class="form-input" placeholder="4500000" required>
+                </div>
+                <div class="form-group">
+                    <label># <span class="lang-lo">ຈຳນວນຫ້ອງນອນ</span><span class="lang-en">Bedrooms</span></label>
+                    <input type="number" id="add-beds" class="form-input" placeholder="3" required>
+                </div>
+                <div class="form-group">
+                    <label># <span class="lang-lo">ຈຳນວນຫ້ອງນ້ຳ</span><span class="lang-en">Bathrooms</span></label>
+                    <input type="number" id="add-baths" class="form-input" placeholder="2" required>
+                </div>
+                <div class="form-group">
+                    <label># <span class="lang-lo">URL ຮູບພາບເຮືອນ</span><span class="lang-en">Image URL</span></label>
+                    <input type="url" id="add-image" class="form-input" placeholder="https://images.unsplash.com/..." required>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label># <span class="lang-lo">ລາຍລະອຽດເພີ່ມເຕີມ</span><span class="lang-en">Description</span></label>
+                    <textarea id="add-desc" class="form-input" rows="3" placeholder="More details..." required></textarea>
+                </div>
+                <button type="submit" class="btn-submit-house">
+                    <i class="fa-solid fa-plus"></i> 
+                    <span class="lang-lo">ອັບໂຫຼດຂຶ້ນໜ້າເວັບ</span><span class="lang-en">Upload to Website</span>
+                </button>
+            </form>
+        </div>
+
         <div class="filter-panel">
             <div class="filter-group">
-                <label><i class="fa-solid fa-location-dot"></i> ເລືອກເຂດ/ເມືອງ</label>
-                <select class="filter-select" id="location-select" onchange="filterHouses()">
-                    <option value="all">THANG-MOD (ທັງໝົດທຸກເມືອງ)</option>
-                    <option value="ໄຊເສດຖາ">ເມືອງ ໄຊເສດຖา</option>
-                    <option value="ສີສັດຕະນາກ">ເມືອງ ສີສັດຕະນາກ</option>
-                    <option value="ຈັນທະບູລີ">ເມືອງ ຈันທະບູລີ</option>
+                <label><i class="fa-solid fa-location-dot"></i> <span class="lang-lo">ເລືອກເຂດ/ເມືອງ</span><span class="lang-en">Select District</span></label>
+                <select class="filter-select" id="location-select">
+                    <option value="all">ທັງໝົດທຸກເມືອງ / All Districts</option>
+                    <option value="ໄຊເສດຖາ">ເມືອງ ໄຊເສດຖາ / Xaysettha</option>
+                    <option value="ສີສັດຕະນາກ">ເມືອງ ສີສັດຕະນາກ / Sisattanak</option>
+                    <option value="ຈັນທະບູລີ">ເມືອງ ຈັນທະບູລີ / Chanthabouly</option>
                 </select>
             </div>
             <div class="filter-group">
-                <label><i class="fa-solid fa-money-bill-wave"></i> ຊ່ວງລາຄา (ຕໍ່ເດືອນ)</label>
-                <select class="filter-select" id="price-select" onchange="filterHouses()">
-                    <option value="all">ທັງໝົດທຸກລາຄາ</option>
+                <label><i class="fa-solid fa-money-bill-wave"></i> <span class="lang-lo">ຊ່ວງລາຄາ (ຕໍ່ເດືອນ)</span><span class="lang-en">Price Range</span></label>
+                <select class="filter-select" id="price-select">
+                    <option value="all">ທັງໝົດທຸກລາຄາ / All Prices</option>
                     <option value="low">ຕໍ່າກວ່າ 3,000,000 ກີບ</option>
                     <option value="medium">3,000,000 - 6,000,000 ກີບ</option>
                     <option value="high">6,000,000 ກີບ ຂຶ້ນໄປ</option>
@@ -231,71 +358,155 @@
 
     <div class="modal-overlay" id="house-modal">
         <div class="modal-box">
-            <button class="close-modal" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <button class="close-modal" id="close-modal-btn"><i class="fa-solid fa-xmark"></i></button>
             <img src="" id="modal-img" class="modal-img">
             <div class="modal-content">
                 <div class="modal-price" id="modal-price"></div>
                 <h2 class="modal-title" id="modal-title"></h2>
                 <div class="house-location" id="modal-location"></div>
-                
                 <div class="house-details" style="border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px;">
                     <span id="modal-beds"></span>
                     <span id="modal-baths"></span>
                 </div>
-                
-                <div class="modal-desc-title"><i class="fa-solid fa-circle-info"></i> ລາຍລະອຽດເພີ່ມເຕີມ:</div>
+                <div class="modal-desc-title"><i class="fa-solid fa-circle-info"></i> <span class="lang-lo">ລາຍລະອຽດເພີ່ມເຕີມ:</span><span class="lang-en">Description:</span></div>
                 <p class="modal-desc" id="modal-desc"></p>
-                
-                <a href="" id="modal-wa-link" target="_blank" class="btn-whatsapp">
-                    <i class="fa-brands fa-whatsapp"></i> ສົນໃຈເຊົ່າ/ນັດເບິ່ງເຮືອນແທ້
-                </a>
+                <a href="" id="modal-wa-link" target="_blank" class="btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> <span class="lang-lo">ສົນໃຈເຊົ່າ/ນັດເບິ່ງເຮືອນແທ້</span><span class="lang-en">Contact via WhatsApp</span></a>
             </div>
         </div>
     </div>
 
     <footer><p>&copy; 2026 LaoHomeRent Directory. All Rights Reserved.</p></footer>
 
-    <script>
-        // 🏠 ຖານຂໍ້ມູນບ້ານເຊົ່າ (ເພີ່ມ Description ລາຍລະອຽດເຂົ້າໄປ)
-        const houses = [
-            {
-                id: 1,
-                title: "ເຮືອນວິນລາ 2 ຊັ້ນ ຕົບແຕ່ງພ້ອມຢູ່",
-                location: "ເມືອງ ໄຊເສດຖາ",
-                price: 7500000,
-                priceGroup: "high",
-                beds: 4,
-                baths: 3,
-                status: "ວ່າງຢູ່",
-                desc: "ເຮືອນວິນລາຫຼູຫຼາສະໄຕລ໌ໂມເດິນ ຕັ້ງຢູ່ເຂດຊຸມຊົນປອດໄພ, ມີເຟີນີເຈີຄົບຊຸດ (ແອ, ຕູ້ເຢັນ, ໂຊຟາ, ຕຽງນອນ). ມີເດີ່ນຈອດລົດກວ້າງຂວາງສາມາດຈອດລົດໃຫຍ່ໄດ້ 2-3 ຄັນ. ເໝາະສຳລັບຄອບຄົວໃຫຍ່ ຫຼື ເຮັດເປັນຫ້ອງການ.",
-                image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=500"
-            },
-            {
-                id: 2,
-                title: "ห້ອງແຖວສ້າງໃໝ່ ໃກ້ໃນເມືອງ",
-                location: "ເມືອງ ສີສັດຕະນາກ",
-                price: 2500000,
-                priceGroup: "low",
-                beds: 1,
-                baths: 1,
-                status: "ວ່າງຢູ່",
-                desc: "ຫ້ອງແຖວປັບປຸງໃໝ່ ຕິດທາງຮ່ອມໃຫຍ່ ເຂົ້າ-ອອກສະດວກ. ພາຍໃນຫ້ອງມີພັດລົມເພດານ, ຊິ້ງລ້າງຈານ, ແລະ ຫ້ອງນ້ຳໃນຕົວ. ໃກ້ຕະຫຼາດ, ເໝາະສຳລັບນັກສຶກສາ ຫຼື ຄົນເຮັດວຽກຕົວຄົນດຽວ.",
-                image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=500"
-            },
-            {
-                id: 3,
-                title: "ບ້ານດ່ຽວຊັ້ນດຽວ ມີເດີ່ນຈອດລົດກວ້າງ",
-                location: "ເມືອງ ຈັນທະບູລີ",
-                price: 4500000,
-                priceGroup: "medium",
-                beds: 3,
-                baths: 2,
-                status: "ວ່າງຢູ່",
-                desc: "ບ້ານດ່ຽວຊັ້ນດຽວບັນຍາກາດງຽບສະຫງົບ ບໍ່ວຸ້ນວາຍ. ມີ 3 ຫ້ອງນອນກວ້າງ, ເຮືອນຄົວແຍກເປັນສັດສ່ວນ. ລະບົບນ້ຳ-ໄຟຟ້າຄົບພ້ອມໃຊ້ງານ, ຫ່າງຈາກຖະໜົນໃຫຍ່ພຽງແຕ່ 100 ແມັດ.",
-                image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=500"
-            }
-        ];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // ຄ່າ Firebase Config ຂອງທ່ານ
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_wQSSrU2wd0roLgtQ4rM0U9uoxcojaxg",
+            authDomain: "laohomerent.firebaseapp.com",
+            databaseURL: "https://laohomerent-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "laohomerent",
+            storageBucket: "laohomerent.firebasestorage.app",
+            messagingSenderId: "360880197082",
+            appId: "1:360880197082:web:dce80ec0e4826713f044e3",
+            measurementId: "G-KNZ7KMZEF1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let houses = [];
+        let isAdminActive = false;
+
+        const ADMIN_PASSWORD = "123456"; 
+
+        function toggleAdminPanel() {
+            const panel = document.getElementById('admin-panel');
+            const actionButtons = document.querySelectorAll('.admin-actions');
+            
+            if(panel.style.display === 'block') {
+                panel.style.display = 'none';
+                isAdminActive = false;
+                actionButtons.forEach(btn => btn.style.display = 'none');
+            } else {
+                const promptPassword = prompt("ກະລຸນາປ້ອນລະຫັດຜ່ານຫຼັງບ້ານ (Please enter Admin Password):");
+                if (promptPassword === ADMIN_PASSWORD) {
+                    panel.style.display = 'block';
+                    isAdminActive = true;
+                    actionButtons.forEach(btn => btn.style.display = 'flex');
+                    panel.scrollIntoView({ behavior: 'smooth' });
+                } else if (promptPassword !== null) {
+                    alert("❌ ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ! (Incorrect Password)");
+                }
+            }
+        }
+        document.getElementById('admin-gate-btn').addEventListener('click', toggleAdminPanel);
+
+        // 🌓 Dark Mode / Light Mode
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const icon = themeToggle.querySelector('i');
+            if (currentTheme === 'light') {
+                document.body.setAttribute('data-theme', 'dark');
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                document.body.setAttribute('data-theme', 'light');
+                icon.className = 'fa-solid fa-moon';
+            }
+        });
+
+        // 🌐 Language Switcher
+        const langToggle = document.getElementById('lang-toggle');
+        langToggle.addEventListener('click', () => {
+            const currentLang = document.body.getAttribute('data-lang');
+            if (currentLang === 'lo') {
+                document.body.setAttribute('data-lang', 'en');
+            } else {
+                document.body.setAttribute('data-lang', 'lo');
+            }
+        });
+
+        // 🔄 Real-time Database Listener
+        onSnapshot(collection(db, "houses"), (snapshot) => {
+            houses = [];
+            snapshot.forEach((doc) => {
+                let data = doc.data();
+                data.id = doc.id;
+                houses.push(data);
+            });
+            filterHouses();
+        }, (error) => {
+            console.error("Error reading data from Firebase: ", error);
+        });
+
+        // 📥 ຟັງກ໌ຊັ່ນເພີ່ມຂໍ້ມູນບ້ານເຊົ່າ
+        async function addHouseToFirebase(e) {
+            e.preventDefault();
+            const price = parseInt(document.getElementById('add-price').value);
+            let priceGroup = "medium";
+            if (price < 3000000) priceGroup = "low";
+            else if (price > 6000000) priceGroup = "high";
+
+            const newHouse = {
+                title: document.getElementById('add-title').value,
+                location: document.getElementById('add-location').value,
+                price: price,
+                priceGroup: priceGroup,
+                beds: parseInt(document.getElementById('add-beds').value),
+                baths: parseInt(document.getElementById('add-baths').value),
+                status: "ວ່າງຢູ່",
+                desc: document.getElementById('add-desc').value,
+                image: document.getElementById('add-image').value
+            };
+
+            try {
+                await addDoc(collection(db, "houses"), newHouse);
+                alert("🎉 ເພີ່ມຂໍ້ມູນບ້ານເຊົ່າຫຼັງບ້ານສຳເລັດແລ້ວ!");
+                document.getElementById('house-form').reset();
+            } catch (error) {
+                alert("❌ ບໍ່ສາມາດບັນທຶກໄດ້ເນື່ອງຈາກ: " + error.message + "\n\nແນະນຳໃຫ້ກວດເບິ່ງ Firestore Rules ໃນ Firebase Console ຂອງທ່ານວ່າໄດ້ເປີດໃຫ້ Read/Write ແລ້ວຫຼືບໍ່.");
+                console.error("Error writing data: ", error);
+            }
+        }
+        document.getElementById('house-form').addEventListener('submit', addHouseToFirebase);
+
+        // 🗑️ ຟັງກ໌ຊັ່ນລຶບຂໍ້ມູນບ້ານເຊົ່າ
+        async function deleteHouse(id, e) {
+            e.stopPropagation();
+            if(confirm("ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບບ້ານເຊົ່າຫຼັງນີ້?")) {
+                try {
+                    await deleteDoc(doc(db, "houses", id));
+                    alert("ລຶບຂໍ້ມູນສຳເລັດ!");
+                } catch (error) {
+                    alert("ບໍ່ສາມາດລຶບໄດ້: " + error.message);
+                }
+            }
+        }
+        window.deleteHouse = deleteHouse;
+
+        // 🔍 Filter System
         function filterHouses() {
             const grid = document.getElementById('house-grid');
             const selectedLocation = document.getElementById('location-select').value;
@@ -309,18 +520,22 @@
             });
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; color:var(--gray);">❌ ບໍ່ພົບເຮືອນເຊົ່າ</div>`;
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; color:var(--gray);">❌ ບໍ່ພົບເຮືອນເຊົ່າໃນລະບົບ / No Properties Found</div>`;
                 return;
             }
 
             filtered.forEach(h => {
                 const card = document.createElement('div');
                 card.className = 'house-card';
-                // ເມື່ອກົດທີ່ກາດ ໃຫ້ໄປລັນຟັງກ໌ຊັ່ນເປີດ Pop-up
                 card.onclick = () => openModal(h);
+                const displayAdminBtn = isAdminActive ? 'flex' : 'none';
+
                 card.innerHTML = `
+                    <div class="admin-actions" style="display: ${displayAdminBtn};">
+                        <button class="btn-delete-house" onclick="deleteHouse('${h.id}', event)"><i class="fa-solid fa-trash"></i> ລຶບ</button>
+                    </div>
                     <div class="house-img-box">
-                        <img src="${h.image}" class="house-img">
+                        <img src="${h.image}" class="house-img" onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=500'">
                         <span class="status-tag">${h.status}</span>
                     </div>
                     <div class="house-info">
@@ -328,47 +543,37 @@
                         <h3 class="house-title">${h.title}</h3>
                         <div class="house-location"><i class="fa-solid fa-location-dot"></i> ${h.location}</div>
                         <div class="house-details">
-                            <span><i class="fa-solid fa-bed"></i> ${h.beds} ຫ້ອງນອນ</span>
-                            <span><i class="fa-solid fa-bath"></i> ${h.baths} ຫ້ອງນໍ້າ</span>
+                            <span><i class="fa-solid fa-bed"></i> ${h.beds} <span class="lang-lo">ຫ້ອງນອນ</span><span class="lang-en">Beds</span></span>
+                            <span><i class="fa-solid fa-bath"></i> ${h.baths} <span class="lang-lo">ຫ້ອງນໍ້າ</span><span class="lang-en">Baths</span></span>
                         </div>
-                        <button class="btn-view-detail">ເບິ່ງລາຍລະອຽດ</button>
+                        <button class="btn-view-detail"><span class="lang-lo">ເບິ່ງລາຍລະອຽດ</span><span class="lang-en">View Details</span></button>
                     </div>
                 `;
                 grid.appendChild(card);
             });
         }
+        document.getElementById('location-select').addEventListener('change', filterHouses);
+        document.getElementById('price-select').addEventListener('change', filterHouses);
 
-        // 🔓 ຟັງກ໌ຊັ່ນເປີດໜ້າຕ່າງ Pop-up ແລະ ໃສ່ຂໍ້ມູນ
+        // Pop-up Detail Modal
         function openModal(house) {
             document.getElementById('modal-img').src = house.image;
             document.getElementById('modal-price').innerHTML = house.price.toLocaleString() + " <span>ກີບ/ເດືອນ</span>";
             document.getElementById('modal-title').innerText = house.title;
             document.getElementById('modal-location').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${house.location}`;
-            document.getElementById('modal-beds').innerHTML = `<i class="fa-solid fa-bed"></i> ${house.beds} ຫ້ອງນອນ`;
-            document.getElementById('modal-baths').innerHTML = `<i class="fa-solid fa-bath"></i> ${house.baths} ຫ້ອງນໍ້າ`;
+            document.getElementById('modal-beds').innerHTML = `<i class="fa-solid fa-bed"></i> ${house.beds} ຫ້ອງນອນ / Beds`;
+            document.getElementById('modal-baths').innerHTML = `<i class="fa-solid fa-bath"></i> ${house.baths} ຫ້ອງນໍ້າ / Baths`;
             document.getElementById('modal-desc').innerText = house.desc;
-            
-            // ຜູກລິ້ງສົ່ງຫາ WhatsApp ພ້ອມຂໍ້ຄວາມອັດຕະໂນມັດ
             document.getElementById('modal-wa-link').href = `https://wa.me/2076431162?text=ສົນໃຈເຮືອນ: ${encodeURIComponent(house.title)}`;
-            
-            // ສະແດງ Pop-up
             document.getElementById('house-modal').style.display = 'flex';
         }
 
-        // 🔒 ຟັງກ໌ຊັ່ນປິດ Pop-up
-        function closeModal() {
-            document.getElementById('house-modal').style.display = 'none';
-        }
-
-        // ປິດ Pop-up ເມື່ອກົດພື້ນທີ່ຫວ່າງດ້ານນອກ
+        function closeModal() { document.getElementById('house-modal').style.display = 'none'; }
+        document.getElementById('close-modal-btn').addEventListener('click', closeModal);
         window.onclick = function(event) {
             const modal = document.getElementById('house-modal');
-            if (event.target === modal) {
-                closeModal();
-            }
+            if (event.target === modal) { closeModal(); }
         }
-
-        filterHouses();
     </script>
 </body>
 </html>
